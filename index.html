@@ -1,1474 +1,199 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CAMPUS RIDE (Ultimate Edition)</title>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tailwind Configuration -->
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#FACC15', // Taxi Yellow
-                        dark: '#050505',
-                        "taxi-yellow": "#FACC15", 
-                        "taxi-dark": "#111111",   
-                        "card-bg": "#1A1A1A",
-                        "dark-bg": "#050505",
-                        "neon-cyan": "#00f3ff",
-                        "neon-red": "#ff003c",
-                        "neon-green": "#00ff66",
-                        "neon-blue": "#0088ff",
-                    },
-                    fontFamily: {
-                        sans: ['Space Grotesk', 'sans-serif'],
-                        "display": ["Space Grotesk", "sans-serif"],
-                        "mono": ["Rajdhani", "monospace"], 
-                        "digital": ["Orbitron", "sans-serif"] 
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-glow': 'pulse-glow 3s infinite',
-                        'slide-up': 'slide-up 0.8s ease-out forwards',
-                        'enter': 'enter 0.6s ease-out forwards',
-                        'spin-slow': 'spin 10s linear infinite',
-                        'radar': 'radar 2s linear infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        'pulse-glow': {
-                            '0%, 100%': { opacity: '0.5' },
-                            '50%': { opacity: '0.1' },
-                        },
-                        'slide-up': {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        enter: {
-                            '0%': { opacity: '0', transform: 'translateY(50px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        radar: {
-                            '0%': { transform: 'rotate(0deg)' },
-                            '100%': { transform: 'rotate(360deg)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    
-    <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0" rel="stylesheet"/>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ को गूगल शीट में सेव करें</title>
     <style>
-        /* GLOBAL SETTINGS */
-        :root {
-            --neon-cyan: #00f3ff;
-            --neon-red: #ff003c;
-            --neon-green: #00ff66;
-            --neon-blue: #0088ff;
-            --bg-dark: #050505;
-            --taxi-yellow: #FACC15;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        * { -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-dark); color: white; height: 100vh; overflow: hidden; }
-        .hidden { display: none !important; }
-        .full-screen { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; 
-            background: var(--bg-dark); 
-            z-index: 10; 
-            transition: opacity 0.4s ease;
-            overflow: hidden; 
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
-        /* === SCREEN 1: SPLASH === */
-        .bg-grid-pattern {
-            background-image: linear-gradient(to right, #ffffff05 1px, transparent 1px),
-                              linear-gradient(to bottom, #ffffff05 1px, transparent 1px);
-            background-size: 40px 40px;
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 20px;
         }
-        .content-transition { transition: opacity 0.4s ease, transform 0.4s ease; }
-        .opacity-0-trans { opacity: 0; transform: translateY(20px); }
-        .opacity-100-trans { opacity: 1; transform: translateY(0); }
-
-        /* === SCREEN 2: ROLES === */
-        .role-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
         }
-        .role-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: #FACC15;
-            box-shadow: 0 20px 40px -10px rgba(250, 204, 21, 0.15);
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
         }
-
-        /* === SCREEN 3: NEW FLEET SELECTION === */
-        #screen-selection {
-            background-color: #050505;
-            background-image: 
-                radial-gradient(circle at 50% 0%, rgba(250, 204, 21, 0.15), transparent 40%),
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            min-width: 150px;
         }
-        .glass-panel-nav {
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        button:hover:not(:disabled) {
+            background-color: #155ab6;
         }
-        .fleet-card {
-            transform-style: preserve-3d;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
-        .fleet-card:active { transform: scale(0.98); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* === SCREEN 4: DRIVER DASHBOARD === */
-        #screen-driver {
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+        #status-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
         }
-        
-        .tactical-grid {
-            position: absolute; inset: 0; opacity: 0.15;
-            background-image: linear-gradient(var(--neon-cyan) 1px, transparent 1px),
-            linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px);
-            background-size: 50px 50px;
-            perspective: 1000px; transform-style: preserve-3d;
+        .success {
+            color: #28a745;
         }
-        
-        .radar-sweep {
-            position: absolute; top: 50%; left: 50%; width: 300px; height: 300px;
-            transform: translate(-50%, -50%); border-radius: 50%;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1), inset 0 0 20px rgba(0, 243, 255, 0.1);
+        .error {
+            color: #dc3545;
         }
-        .radar-sweep::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 243, 255, 0.2) 60deg, transparent 65deg);
-            animation: radar 2s linear infinite;
-        }
-
-        .power-btn {
-            position: relative;
-            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
-            border: 1px solid #333; color: #555;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-        .power-btn::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .power-btn.active {
-            background: linear-gradient(180deg, #330000 0%, #000 100%);
-            color: var(--neon-red);
-            border-color: var(--neon-red);
-            box-shadow: 0 0 30px rgba(255, 0, 60, 0.4);
-        }
-        .power-btn.active .btn-status-text { color: var(--neon-red); }
-        .power-btn.active .material-symbols-outlined { color: var(--neon-red); }
-        
-        .station-btn {
-            background: rgba(0, 243, 255, 0.1);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            transition: all 0.3s ease;
-        }
-        .station-btn:active {
-            background: var(--neon-cyan);
-            color: black;
-            transform: scale(0.95);
-        }
-        
-        .terminal-screen {
-            background: rgba(0, 10, 15, 0.9);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            font-family: 'Rajdhani', monospace;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            position: relative; overflow: hidden;
-        }
-        .terminal-screen::before {
-            content: "LIVE DATA STREAM";
-            position: absolute; top: 5px; right: 10px;
-            font-size: 8px; color: var(--neon-cyan); opacity: 0.5; letter-spacing: 2px;
-        }
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(0, 243, 255, 0.3);
-            animation: scan 3s linear infinite;
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-        @keyframes scan { 0% {top:0;} 100% {top:100%;} }
-
-        /* === SCREEN 5: STUDENT MAP UI === */
-        #map { height: 100%; width: 100%; z-index: 1; }
-        
-        /* TOP STRIP (TRANSPARENT) */
-        .top-info-strip {
-            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            z-index: 999;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 20px;
-            pointer-events: none;
-        }
-        .top-info-strip > div { pointer-events: auto; }
-        
-        .info-block { text-align: center; }
-        .info-label { font-size: 10px; color: #888; letter-spacing: 1px; font-weight: bold; }
-        .info-value {
-            font-family: 'Orbitron'; font-size: 1.4rem; color: white;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
-        }
-        .eta-value { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
-        .status-value { color: var(--neon-green); font-size: 1rem; }
-
-        /* SETTINGS BUTTON */
-        .settings-btn {
-            width: 40px; height: 40px; 
-            background: rgba(255,255,255,0.1); 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; pointer-events: auto;
-            transition: all 0.3s;
-        }
-        .settings-btn:active { background: white; color: black; }
-
-        /* SIDE SETTINGS MENU */
-        .side-menu {
-            position: absolute; top: 0; right: 0; width: 250px; height: 100%;
-            background: rgba(5,5,5,0.95);
-            border-left: 1px solid var(--taxi-yellow);
-            z-index: 2000;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-        .side-menu.open { transform: translateX(0); }
-        
-        .menu-item {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: white; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .menu-item:active { background: rgba(250, 204, 21, 0.2); }
-        .menu-item .material-symbols-outlined { color: var(--taxi-yellow); }
-
-        /* BOTTOM NAV */
-        .bottom-nav {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 65px;
-            background: #020b14; border-top: 1px solid var(--neon-cyan);
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            color: #555; font-size: 0.7rem; cursor: pointer; font-family: 'Rajdhani'; width: 25%;
-        }
-        .nav-item.active { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); }
-        
-        /* === CUSTOM MAP MARKERS === */
-        .map-pin-container {
-            width: 50px; height: 50px;
-            display: flex; justify-content: center; align-items: center;
-            position: relative;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
-            transition: transform 0.3s ease;
-        }
-        .pin-outer-bus {
-            font-size: 50px; color: #ff003c; position: absolute; top: -20px;
-            text-shadow: 0 0 10px rgba(255, 0, 60, 0.6); z-index: 1;
-        }
-        .pin-inner-icon-bus {
-            font-size: 20px; color: white; position: absolute; top: -8px; z-index: 2;
-        }
-        .pin-outer-student {
-            font-size: 50px; color: #00ff66; position: absolute; top: -20px;
-            text-shadow: 0 0 10px rgba(0, 255, 102, 0.6); z-index: 1;
-        }
-        .pin-inner-icon-student {
-            font-size: 20px; color: black; position: absolute; top: -8px; z-index: 2; font-weight: bold;
-        }
-        .pin-outer-ghost {
-            font-size: 50px; color: #0088ff; position: absolute; top: -20px;
-            text-shadow: 0 0 10px rgba(0, 136, 255, 0.6); z-index: 1; opacity: 0.7;
-        }
-        .pin-pulse {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 10px; background: rgba(0,0,0,0.5);
-            border-radius: 50%; filter: blur(2px); z-index: 0;
-        }
-        
-        /* CUSTOM STATION DOT (GREEN) */
-        .custom-station-dot {
-            width: 20px; height: 20px; background: #00ff66;
-            border-radius: 50%; border: 3px solid white;
-            box-shadow: 0 0 15px #00ff66;
-            animation: pulse-glow 2s infinite;
-        }
-
-        /* START WALK BUTTON */
-        #btn-start-walk {
-            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: #FACC15; /* Changed to Yellow */
-            color: black; font-weight: bold;
-            padding: 10px 20px; border-radius: 20px;
-            box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
-            font-family: 'Rajdhani', sans-serif;
-            z-index: 998; letter-spacing: 1px;
-            display: none; /* Hidden by default until station is set */
-            border: 2px solid white;
-        }
-        #btn-start-walk:active { transform: translateX(-50%) scale(0.95); }
-
-        .marker-pin-station { font-size: 28px; filter: drop-shadow(0 0 10px #ff00ea); text-align: center; color: #ff00ea; }
-
-        /* MODAL OVERLAY */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2500;
-            display: flex; items-center; justify-content: center; opacity: 0; pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background: #111; border: 1px solid var(--taxi-yellow); padding: 20px;
-            border-radius: 15px; width: 85%; max-width: 350px; max-height: 80vh; overflow-y: auto;
-            transform: scale(0.9); transition: transform 0.3s;
-        }
-        .modal-overlay.open .modal-content { transform: scale(1); }
-
-        .input-field {
-            width: 100%; bg: black; border: 1px solid #333; border-radius: 5px; 
-            padding: 10px; color: white; margin-top: 5px; outline: none;
-        }
-        .input-field:focus { border-color: var(--taxi-yellow); }
-
-        /* Hide Routing Machine Container BUT KEEP LINES */
-        .leaflet-routing-container { display: none !important; }
-        
-        /* OVERLAY BACKDROP FOR MENU */
-        .overlay-backdrop {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 1999;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        .overlay-backdrop.active { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: SPLASH -->
-    <div id="screen-splash" class="full-screen" style="font-family: 'Space Grotesk', sans-serif;">
-        <div class="absolute inset-0 bg-grid-pattern z-0 pointer-events-none"></div>
-        <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[100px]"></div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[100px]"></div>
+    <div class="container">
+        <h1>MCQ पेस्ट करें और शीट में सेव करें</h1>
+        <form id="mcq-form">
+            <textarea id="mcq-text" placeholder="यहां अपने सभी MCQs इस फॉर्मेट में पेस्ट करें...
 
-        <div class="relative z-10 flex flex-col items-center justify-between h-full w-full p-6 pb-8">
-            <div class="w-full h-10 flex justify-end items-center">
-                <button id="skip-btn" onclick="finishOnboarding()" class="text-white/40 text-sm uppercase tracking-widest font-bold hover:text-primary transition-colors hidden z-50">Skip</button>
+4. The germ theory of disease was proposed by:
+A. Hippocrates
+B. Louis Pasteur
+C. Rudolf Virchow
+D. John Snow
+✅ Answer: B
+
+(अगले प्रश्न के लिए एक लाइन खाली छोड़ें)
+
+5. Social medicine primarily focuses on:
+A. Individual treatment
+B. Hospital-based care
+C. Social and economic determinants of health
+D. Laboratory diagnosis
+✅ Answer: C"></textarea>
+            <div class="button-container">
+                <button type="submit" id="submit-button">शीट में सेव करें</button>
             </div>
-            <div class="flex flex-col items-center justify-center w-full max-w-md flex-grow">
-                <div class="relative w-72 h-72 mb-8 flex items-center justify-center animate-float">
-                    <div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full transform scale-75 transition-all duration-700" id="glow-effect"></div>
-                    <img src="https://i.ibb.co/S4kzPVhb/q-JRq-XKw-TQyy-A3-Dyb-XU4rew.webp" alt="Campus Ride 3D Vehicle" class="relative w-full h-full object-contain drop-shadow-2xl">
-                </div>
-                <div id="text-content" class="text-center space-y-3 content-transition opacity-100-trans">
-                    <h1 id="main-title" class="text-5xl font-bold tracking-tighter text-white h-24 flex items-end justify-center">
-                        Campus <span class="text-primary ml-2">Ride</span>
-                    </h1>
-                    <div class="glass-panel-nav px-6 py-3 rounded-2xl inline-block mt-2 min-h-[5rem] flex items-center justify-center border-none bg-white/5">
-                        <p id="main-desc" class="text-gray-300 text-lg font-medium tracking-wide">
-                            Track Smarter. <span class="text-white">Travel Safer.</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="w-full max-w-md space-y-6">
-                <div id="dots-container" class="flex justify-center gap-3 mb-4 transition-all duration-500 opacity-0">
-                    <div class="dot w-2 h-2 rounded-full bg-white/20 transition-all duration-300"></div>
-                    <div class="dot w-2 h-2 rounded-full bg-white/20 transition-all duration-300"></div>
-                    <div class="dot w-2 h-2 rounded-full bg-white/20 transition-all duration-300"></div>
-                </div>
-                <button id="action-btn" onclick="nextSlide()" class="group relative w-full h-16 bg-primary rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(242,223,13,0.3)] transition-all hover:shadow-[0_0_30px_rgba(242,223,13,0.5)] active:scale-95 z-50">
-                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    <span class="relative flex items-center justify-center gap-3 text-dark text-xl font-bold uppercase tracking-wider">
-                        <span id="btn-text">Let's Go</span>
-                        <span id="btn-icon" class="material-symbols-outlined font-bold group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                    </span>
-                </button>
-            </div>
-        </div>
+        </form>
+        <div id="status-message"></div>
     </div>
 
-    <!-- SCREEN 2: ROLE SELECTION -->
-    <div id="screen-roles" class="full-screen hidden font-display text-white relative">
-        <div class="absolute inset-0 z-0 bg-[#050505]">
-            <div class="absolute inset-0 bg-grid-pattern opacity-20"></div>
-            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-taxi-yellow/10 rounded-full blur-[100px] animate-pulse-glow"></div>
-        </div>
-        <div class="relative z-10 flex-1 flex flex-col px-6 py-8 max-w-md mx-auto w-full justify-center">
-            <div class="text-center mb-10 animate-slide-up">
-                <div class="inline-flex items-center justify-center p-2 mb-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
-                    <span class="material-symbols-outlined text-taxi-yellow text-sm mr-2">bolt</span>
-                    <span class="text-xs font-bold tracking-widest uppercase text-gray-300">Select Identity</span>
-                </div>
-                <h1 class="text-4xl font-bold tracking-tighter mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
-                    WHO ARE <br /><span class="text-taxi-yellow">YOU?</span>
-                </h1>
-                <p class="text-gray-400 text-sm">Choose your mode to proceed</p>
-            </div>
-            <div class="flex flex-col gap-6 w-full">
-                <button onclick="selectRole('student')" class="role-card group relative w-full rounded-2xl p-1 text-left animate-slide-up" style="animation-delay: 0.1s">
-                    <div class="relative overflow-hidden rounded-xl bg-card-bg/80 h-40 flex items-center justify-between p-6">
-                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#404040 1px, transparent 1px); background-size: 16px 16px;"></div>
-                        <div class="relative z-10 flex flex-col justify-center h-full">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500 text-blue-400 group-hover:text-white transition-colors">
-                                    <span class="material-symbols-outlined text-2xl">school</span>
-                                </div>
-                                <h2 class="text-2xl font-bold text-white group-hover:text-blue-300 transition-colors">Student</h2>
-                            </div>
-                            <p class="text-gray-400 text-sm font-medium pl-1 group-hover:text-gray-200">Book rides easily &<br>reach campus on time.</p>
-                        </div>
-                        <span class="material-symbols-outlined absolute right-[-20px] bottom-[-20px] text-[140px] text-white/5 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">backpack</span>
-                        <div class="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-blue-500 group-hover:border-blue-500 transition-all">
-                            <span class="material-symbols-outlined text-white text-lg group-hover:translate-x-0.5">chevron_right</span>
-                        </div>
-                    </div>
-                </button>
-                <button onclick="selectRole('driver')" class="role-card group relative w-full rounded-2xl p-1 text-left animate-slide-up" style="animation-delay: 0.2s">
-                    <div class="absolute inset-0 bg-gradient-to-r from-taxi-yellow/0 via-taxi-yellow/50 to-taxi-yellow/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-sm"></div>
-                    <div class="relative overflow-hidden rounded-xl bg-card-bg/90 h-48 flex items-center justify-between p-6 border-t border-white/10">
-                        <div class="absolute inset-0 z-0">
-                            <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-20 mix-blend-overlay group-hover:scale-110 transition-transform duration-700" alt="Driving">
-                            <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
-                        </div>
-                        <div class="relative z-10 flex flex-col justify-center h-full w-2/3">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="p-2 bg-taxi-yellow rounded-lg text-black shadow-[0_0_15px_rgba(250,204,21,0.5)] group-hover:shadow-[0_0_25px_rgba(250,204,21,0.8)]">
-                                    <span class="material-symbols-outlined text-2xl font-bold">local_taxi</span>
-                                </div>
-                                <h2 class="text-3xl font-bold text-taxi-yellow">Driver</h2>
-                            </div>
-                            <p class="text-gray-300 text-sm font-medium pl-1 leading-relaxed">Earn on your own schedule.<br>Be your own boss.</p>
-                            <div class="mt-4 flex items-center gap-2 text-taxi-yellow text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                Start Driving <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </div>
-                        </div>
-                        <span class="material-symbols-outlined absolute right-[-30px] bottom-[-20px] text-[160px] text-taxi-yellow/5 transform group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500">steering_wheel</span>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
+    <script>
+        // आपका Web App URL यहाँ डाल दिया गया है
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4kbEIZh0eFle7lentjQvbcJG2a1XdIgqR8iwyOgS_hTbnO_r8hWcRmhCqAA6C6vlN3w/exec'; 
 
-    <!-- SCREEN 3: BUS SELECTION (ACTIVE FLEET) -->
-    <div id="screen-selection" class="full-screen hidden">
-        <!-- Top Fixed Header -->
-        <header class="fixed top-0 left-0 right-0 z-50 px-6 py-4 glass-panel-nav rounded-b-2xl">
-            <div class="flex items-center justify-between">
-                <button onclick="goBack()" class="p-2 rounded-full bg-white/5 text-white active:bg-primary active:text-black transition">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </button>
-                <div class="text-center">
-                    <p class="text-[10px] text-primary tracking-[0.2em] uppercase font-bold">Select Vehicle</p>
-                    <h1 class="text-xl font-bold tracking-tight text-white">ACTIVE FLEET</h1>
-                </div>
-                <button class="p-2 rounded-full bg-white/5 text-white relative">
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                    <span class="material-symbols-outlined">grid_view</span>
-                </button>
-            </div>
-        </header>
+        const mcqForm = document.getElementById('mcq-form');
+        const mcqTextInput = document.getElementById('mcq-text');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
 
-        <!-- Dynamic Content -->
-        <main id="bus-grid-container" class="h-screen overflow-y-auto no-scrollbar pt-24 pb-32 px-5 flex flex-col gap-6">
-            <!-- JS will populate cards here -->
-        </main>
-        
-        <!-- Bottom Fade -->
-        <div class="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none z-40"></div>
+        mcqForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const rawText = mcqTextInput.value.trim();
 
-        <!-- NEW BOTTOM NAV FOR SELECTION SCREEN -->
-        <div class="bottom-nav">
-            <div class="nav-item active">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">home</span>
-                <span style="font-size: 0.7rem;">HOME</span>
-            </div>
-            <div class="nav-item" onclick="alert('Select a Bus to view Map')">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">map</span>
-                <span style="font-size: 0.7rem;">MAP</span>
-            </div>
-            <div class="nav-item" onclick="alert('Select a Bus first')">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">alt_route</span>
-                <span style="font-size: 0.7rem;">ROUTE</span>
-            </div>
-            <div class="nav-item" onclick="openProfile()">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">person</span>
-                <span style="font-size: 0.7rem;">PROFILE</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCREEN 4: DRIVER DASHBOARD -->
-    <div id="screen-driver" class="full-screen hidden font-display">
-        
-        <!-- Background Video (THE HACK) -->
-        <video id="background-video" loop playsinline style="width: 1px; height: 1px; opacity: 0; position: absolute; pointer-events: none;"></video>
-
-        <!-- Background Effects -->
-        <div class="tactical-grid"></div>
-        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black to-transparent z-0"></div>
-
-        <!-- Header -->
-        <div class="relative z-20 flex justify-between items-center p-6 w-full">
-            <button class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-black/40 text-white backdrop-blur-sm active:bg-white/10" onclick="showScreen('selection')">
-                <span class="material-symbols-outlined">arrow_back</span>
-            </button>
-            
-            <div class="text-right">
-                <p class="text-[10px] text-gray-400 tracking-widest uppercase mb-1">Vehicle Identity</p>
-                <h2 style="font-family: 'Orbitron'; letter-spacing: 1px;" class="text-lg text-primary font-bold uppercase drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" id="driver-bus-name">TITAN VOYAGER</h2>
-            </div>
-        </div>
-
-        <!-- Main HUD (Center) -->
-        <div class="flex-1 relative z-10 flex flex-col items-center justify-center w-full">
-            <div class="relative w-64 h-64 flex items-center justify-center mb-6">
-                <div class="absolute inset-0 rounded-full border border-white/10"></div>
-                <div class="absolute inset-4 rounded-full border border-dashed border-white/20 animate-spin-slow"></div>
-                <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-primary/50 animate-pulse"></div>
-                <div class="radar-sweep"></div>
-                <div class="relative z-20 text-center bg-black/80 backdrop-blur-md rounded-full w-40 h-40 flex flex-col items-center justify-center border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-                    <span class="text-white text-5xl font-bold font-digital tracking-tighter drop-shadow-lg">00</span>
-                    <span class="text-primary text-[10px] font-bold tracking-[0.3em] mt-1">KM/H</span>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
-                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse" id="status-dot"></div>
-                <span class="text-xs font-bold tracking-widest text-gray-300" id="status-text">DISCONNECTED</span>
-            </div>
-        </div>
-
-        <!-- Bottom Controls -->
-        <div class="relative z-20 w-full px-6 pb-8 space-y-4">
-            <div class="terminal-screen w-full rounded-xl p-4 min-h-[80px]">
-                <div class="scan-line"></div>
-                <div class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-neon-cyan text-sm mt-0.5">terminal</span>
-                    <div class="flex-1">
-                        <p class="text-[10px] text-gray-500 mb-1 font-mono uppercase tracking-wider">System Log</p>
-                        <div id="debug-coords" class="text-neon-cyan font-mono text-xs leading-relaxed uppercase" style="text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);">
-                            > SYSTEM STANDBY<br>> WAITING FOR SATELLITE UPLINK...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button id="btn-add-station" class="station-btn w-full h-12 rounded-lg flex items-center justify-center gap-2 font-bold tracking-widest text-sm uppercase opacity-50 pointer-events-none">
-                <span class="material-symbols-outlined">add_location_alt</span>
-                DROP STATION POINT
-            </button>
-            <p class="text-[9px] text-gray-500 text-center mt-[-10px] uppercase">Tap to Add • Long Press for List</p>
-
-            <button id="btn-toggle-gps" class="power-btn w-full h-16 rounded-lg flex items-center justify-between px-6 group">
-                <span class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white transition-colors">power_settings_new</span>
-                    <span class="btn-status-text font-bold text-lg tracking-widest group-hover:text-white transition-colors">INITIATE SEQUENCE</span>
-                </span>
-                <span class="material-symbols-outlined text-gray-600 group-hover:translate-x-1 transition-transform">chevron_right</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- SCREEN 5: STUDENT MAP & NAV (UPDATED LAYOUT) -->
-    <div id="screen-student" class="full-screen hidden">
-        
-        <!-- NEW TRANSPARENT TOP STRIP -->
-        <div class="top-info-strip">
-            <div class="info-block">
-                <div class="info-label">SPEED</div>
-                <div class="info-value" id="disp-speed">0</div>
-            </div>
-            <div class="info-block">
-                <div class="info-label">ETA</div>
-                <div class="info-value eta-value" id="disp-eta">--</div>
-            </div>
-            <div class="info-block">
-                <div class="info-label">STATUS</div>
-                <div class="info-value status-value" id="disp-time">WAITING</div>
-            </div>
-            <!-- Settings Toggle -->
-            <button onclick="toggleSettings()" class="settings-btn">
-                <span class="material-symbols-outlined">settings</span>
-            </button>
-        </div>
-
-        <!-- SIDE SETTINGS MENU -->
-        <div id="side-menu-overlay" class="overlay-backdrop" onclick="toggleSettings()"></div>
-        <div id="side-menu" class="side-menu">
-            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                <h3 class="text-lg font-bold text-primary font-display">OPTIONS</h3>
-                <button onclick="toggleSettings()" class="text-white">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            
-            <div class="menu-item" onclick="togglePassengerMode()" id="menu-btn-passenger">
-                <span class="material-symbols-outlined">directions_bus</span>
-                <span class="text-sm font-bold tracking-widest">I'M ON BUS</span>
-            </div>
-            
-            <div class="menu-item" onclick="toggleMapTheme()" id="menu-btn-theme">
-                <span class="material-symbols-outlined">dark_mode</span>
-                <span class="text-sm font-bold tracking-widest">TOGGLE THEME</span>
-            </div>
-
-            <div class="menu-item" onclick="refreshTracking()">
-                <span class="material-symbols-outlined">refresh</span>
-                <span class="text-sm font-bold tracking-widest">REFRESH MAP</span>
-            </div>
-
-            <!-- NEW: PUT STATION BUTTON -->
-            <div class="menu-item" onclick="setCustomStation()">
-                <span class="material-symbols-outlined text-neon-green">add_location</span>
-                <span class="text-sm font-bold tracking-widest text-neon-green">SET MY STATION</span>
-            </div>
-        </div>
-
-        <!-- NEW: START WALK BUTTON -->
-        <button id="btn-start-walk" onclick="startWalkingRoute()">
-            START WALK (PATH)
-        </button>
-
-        <div id="map"></div>
-
-        <!-- BOTTOM NAV -->
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="showScreen('selection')">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">home</span>
-                <span style="font-size: 0.7rem;">HOME</span>
-            </div>
-            <div class="nav-item active">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">map</span>
-                <span style="font-size: 0.7rem;">MAP</span>
-            </div>
-            <div class="nav-item" onclick="openRouteList()">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">alt_route</span>
-                <span style="font-size: 0.7rem;">ROUTE</span>
-            </div>
-            <div class="nav-item" onclick="openProfile()">
-                <span class="material-symbols-outlined" style="font-size: 1.5rem;">person</span>
-                <span style="font-size: 0.7rem;">PROFILE</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: STATION LIST (DRIVER) -->
-    <div id="modal-station-list" class="modal-overlay">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4 border-b border-white/20 pb-2">
-                <h3 class="text-neon-cyan font-bold tracking-widest">STATION MANAGER</h3>
-                <button onclick="closeModal('modal-station-list')" class="text-red-500 font-bold">X</button>
-            </div>
-            <div id="station-list-container" class="space-y-3"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: ROUTE LIST (STUDENT) -->
-    <div id="modal-route-list" class="modal-overlay">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4 border-b border-white/20 pb-2">
-                <h3 class="text-neon-cyan font-bold tracking-widest">ROUTE STATIONS</h3>
-                <button onclick="closeModal('modal-route-list')" class="text-red-500 font-bold">X</button>
-            </div>
-            <div id="route-list-content" class="space-y-3"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: PROFILE (STUDENT) -->
-    <div id="modal-profile" class="modal-overlay">
-        <div class="modal-content bg-card-bg">
-            <h3 class="text-primary font-bold text-xl mb-4 text-center">STUDENT IDENTITY</h3>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-500 uppercase">Full Name</label>
-                    <input type="text" id="prof-name" class="w-full bg-black border border-white/20 rounded p-2 text-white focus:border-primary outline-none input-field">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-500 uppercase">Phone Number</label>
-                    <input type="tel" id="prof-phone" class="w-full bg-black border border-white/20 rounded p-2 text-white focus:border-primary outline-none input-field">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-500 uppercase">Email Address</label>
-                    <input type="email" id="prof-email" class="w-full bg-black border border-white/20 rounded p-2 text-white focus:border-primary outline-none input-field">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-500 uppercase">Address / Stop</label>
-                    <input type="text" id="prof-address" class="w-full bg-black border border-white/20 rounded p-2 text-white focus:border-primary outline-none input-field">
-                </div>
-                <button onclick="saveProfile()" class="w-full bg-primary text-black font-bold py-3 rounded mt-4">ESTABLISH ID</button>
-                <button onclick="closeModal('modal-profile')" class="w-full text-gray-500 text-xs py-2">CANCEL</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
-    <!-- Leaflet Routing Machine JS -->
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-    <!-- MAIN LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
-            authDomain: "conceptra-c1000.firebaseapp.com",
-            databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
-            projectId: "conceptra-c1000",
-            storageBucket: "conceptra-c1000.firebasestorage.app",
-            messagingSenderId: "298402987968",
-            appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
-            measurementId: "G-QRQYEVSJJ6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        // --- UPDATED BUS DATA (POWERFUL NAMES + NUMBERS) ---
-        const BUS_DATA = [
-            { id: 'bus1', name: 'APEX TITAN', code: '01', status: 'Online', color: 'green-500', icon: 'local_shipping', desc: '54 Seats • Heavy', img: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800&auto=format&fit=crop' },
-            { id: 'bus2', name: 'NEBULA DRIFTER', code: '02', status: 'In Transit', color: 'primary', icon: 'electric_bus', desc: 'Electric • 5G', img: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=800&auto=format&fit=crop' },
-            { id: 'bus3', name: 'SHADOW PHANTOM', code: '03', status: 'Night Shift', color: 'blue-500', icon: 'visibility_off', desc: 'Stealth Mode', img: 'https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?q=80&w=800&auto=format&fit=crop', filter: 'hue-rotate-180' },
-            { id: 'bus4', name: 'THUNDER BOLT', code: '04', status: 'Express', color: 'yellow-500', icon: 'arrow_forward', desc: 'Express Route', img: 'https://images.unsplash.com/photo-1557223562-6c77ef16210f?q=80&w=800&auto=format&fit=crop', filter: 'grayscale' },
-            { id: 'bus5', name: 'IRON VANGUARD', code: '05', status: 'Secure', color: 'gray-500', icon: 'shield', desc: 'High Security', img: 'https://images.unsplash.com/photo-1562281285-d72b2c453535?q=80&w=800&auto=format&fit=crop' },
-            { id: 'bus6', name: 'MECH WARRIOR', code: '06', status: 'Maintenance', color: 'orange-500', icon: 'build', desc: 'Garage B2', img: 'https://images.unsplash.com/photo-1621953253503-49033327d674?q=80&w=800&auto=format&fit=crop', filter: 'grayscale' },
-            { id: 'bus7', name: 'OMEGA SUPREME', code: '07', status: 'VIP ONLY', color: 'purple-500', icon: 'diamond', desc: 'Luxury Class', img: 'https://images.unsplash.com/photo-1600721389086-538029a1d471?q=80&w=800&auto=format&fit=crop' }
-        ];
-
-        let currentMode = null;
-        let selectedBus = null;
-        let watchId = null;
-        let map = null;
-        let busMarker = null;
-        let studentMarker = null;
-        let stationMarkers = [];
-        let isDriving = false;
-        let currentPos = null;
-        let studentWatchId = null;
-        let studentPos = null;
-        let routePolyline = null; // Store the Leaflet Polyline here
-        let isPassengerMode = false;
-        let routingControl = null;
-        
-        // NEW VARIABLES FOR WALKING STATION
-        let customStationPos = null;
-        let walkingControl = null;
-        let busPathHistory = []; // Store bus history for green trail
-        let busTrailPolyline = null; // Polyline for green trail
-
-        const screens = {
-            splash: document.getElementById('screen-splash'),
-            roles: document.getElementById('screen-roles'),
-            selection: document.getElementById('screen-selection'),
-            driver: document.getElementById('screen-driver'),
-            student: document.getElementById('screen-student')
-        };
-
-        window.showScreen = function(name) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[name].classList.remove('hidden');
-        };
-
-        window.selectRole = function(role) {
-            currentMode = role;
-            renderBusList();
-            showScreen('selection');
-        };
-
-        window.goBack = function() {
-            if(currentMode) showScreen('roles');
-            else showScreen('splash');
-        };
-
-        window.closeModal = function(id) {
-            document.getElementById(id).classList.remove('open');
-        }
-
-        // --- MENU LOGIC ---
-        window.toggleSettings = function() {
-            const menu = document.getElementById('side-menu');
-            const overlay = document.getElementById('side-menu-overlay');
-            if(menu.classList.contains('open')) {
-                menu.classList.remove('open');
-                overlay.classList.remove('active');
-            } else {
-                menu.classList.add('open');
-                overlay.classList.add('active');
-            }
-        }
-
-        window.refreshTracking = function() {
-            if(map && busMarker) {
-                map.setView(busMarker.getLatLng(), 16);
-                toggleSettings();
-            } else {
-                alert("Searching for signal...");
-            }
-        }
-
-        // --- NEW: SET CUSTOM STATION (GREEN DOT) ---
-        window.setCustomStation = function() {
-            if(!studentPos) {
-                alert("Wait for GPS Signal first!");
+            if (rawText === "") {
+                alert("कृपया टेक्स्ट बॉक्स में कुछ MCQs पेस्ट करें।");
                 return;
             }
-            
-            // Save current position as station
-            customStationPos = { lat: studentPos.lat, lng: studentPos.lng };
-            
-            // Save to LocalStorage so it remembers even if app closes
-            localStorage.setItem('myStationLat', customStationPos.lat);
-            localStorage.setItem('myStationLng', customStationPos.lng);
 
-            // Draw Dot
-            drawCustomStation();
-            
-            // Show Start Walk Button
-            document.getElementById('btn-start-walk').style.display = 'block';
-
-            alert("STATION SET! When you are away, click 'Start Walk' to see route.");
-            toggleSettings();
-        }
-
-        function drawCustomStation() {
-            if(!map || !customStationPos) return;
-            
-            // Remove old one if exists (we store reference on map object to find it easily, or just redraw)
-            // Ideally we'd keep a reference, but for simplicity, let's just add it.
-            // A Green Dot
-            const icon = L.divIcon({ className: 'custom-station-dot', iconSize: [20, 20] });
-            L.marker([customStationPos.lat, customStationPos.lng], { icon: icon }).addTo(map).bindPopup("MY STATION");
-        }
-
-        // --- NEW: START WALKING ROUTE (Updated to YELLOW) ---
-        window.startWalkingRoute = function() {
-            if(!studentPos || !customStationPos) return;
-
-            if (walkingControl) { map.removeControl(walkingControl); walkingControl = null; }
-
-            // Yellow Line for Walking (Student -> Station)
-            walkingControl = L.Routing.control({
-                waypoints: [ L.latLng(studentPos.lat, studentPos.lng), L.latLng(customStationPos.lat, customStationPos.lng) ],
-                createMarker: function() { return null; },
-                addWaypoints: false,
-                draggableWaypoints: false,
-                fitSelectedRoutes: true,
-                lineOptions: {
-                    styles: [{color: '#FFD700', opacity: 1, weight: 6}] // Changed to Yellow #FFD700
-                },
-                show: false 
-            }).addTo(map);
-        }
-
-        function renderBusList() {
-            const container = document.getElementById('bus-grid-container');
-            container.innerHTML = '';
-            
-            BUS_DATA.forEach((bus, index) => {
-                const card = document.createElement('div');
-                card.className = 'fleet-card group animate-enter';
-                card.style.animationDelay = (index * 0.1) + 's';
-                
-                let badgeColorClass = bus.color === 'primary' ? 'text-primary border-primary/30 bg-primary/20' : `text-${bus.color} border-${bus.color}/30 bg-${bus.color}/20`;
-                if(bus.color.includes('500')) badgeColorClass = badgeColorClass.replace('500', '400');
-
-                card.innerHTML = `
-                <div class="relative w-full h-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group-hover:border-primary/50 transition-colors">
-                    <img src="${bus.img}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ${bus.filter || ''}" alt="Bus">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent"></div>
-                    <div class="absolute top-4 right-4 backdrop-blur-md border px-3 py-1 rounded-full flex items-center gap-1 ${badgeColorClass}">
-                        <div class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
-                        <span class="text-xs font-bold uppercase">${bus.status}</span>
-                    </div>
-                    <div class="absolute bottom-0 left-0 right-0 p-5">
-                        <div class="flex justify-between items-end mb-2">
-                            <div>
-                                <p class="text-primary text-xs font-bold tracking-widest mb-1">${bus.code} • ${bus.desc}</p>
-                                <h2 class="text-2xl font-bold text-white leading-none font-display">${bus.name}</h2>
-                            </div>
-                            <div class="text-right">
-                                <span class="material-symbols-outlined text-4xl text-white/20 group-hover:text-primary transition-colors">${bus.icon}</span>
-                            </div>
-                        </div>
-                        <div class="h-[1px] w-full bg-gradient-to-r from-white/20 to-transparent my-3"></div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex gap-4 text-gray-400 text-sm font-mono">ID: ${bus.code}00X</div>
-                            <button id="btn-${bus.id}" class="bg-primary text-black px-6 py-2 rounded-lg font-bold text-sm hover:bg-white transition-colors shadow-[0_0_15px_rgba(250,204,21,0.4)]">
-                                SELECT
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                `;
-                container.appendChild(card);
-                document.getElementById(`btn-${bus.id}`).onclick = () => selectBus(bus);
-            });
-        }
-
-        function selectBus(bus) {
-            selectedBus = bus;
-            if (currentMode === 'driver') {
-                const pass = prompt("ENTER DRIVER ACCESS CODE:");
-                if (pass === '12345678') initDriverScreen();
-                else alert("ACCESS DENIED: INCORRECT CREDENTIALS");
+            const parsedMCQs = parseMCQs(rawText);
+            if (parsedMCQs.length > 0) {
+                sendDataToSheet(parsedMCQs);
             } else {
-                initStudentScreen();
-            }
-        }
-
-        const BLANK_VIDEO = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28yYXZjMQAAAAhmcmVlAAAGF21kYXQAAAKABQb//5/4ACZcAAAAJ2B0cmFrAAAAXHRraGQAAAAHAAAAAQAAAAABAAAAAAABAAAAAAAAAAAAAAABAAAAAAH0ZWR0cwAAACxlbHN0AAAAAAAAAAEAAAABAAAAAAABAAAAAAABAAAAAAABAAAAAAABAAAAAAWKbWRpYQAAACBtZGhkwV7m+MFe5vgAAAAAAAEAAAAAAAEAAAAAAAABK2hkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXQAAAAAQ21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAChzdGJsAAAAJ3N0c2QAAAAAAAAAAQAAABdhdmMxAAAAAAAAAAEAAQAAAAABAAEAAAAgbXBwYQAAAAAAAAAAAAEAAAABAAAAAQEAAAABAAAAAHRzdHRzAAAAAAAAAAEAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAAQAAAAEAAAAcc3RzegAAAAAAAAAAAAAAAQAAABRzdGNvAAAAAAAAAAEAAA4AAAAGdWR0YQAAABRtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAA";
-
-        function initDriverScreen() {
-            showScreen('driver');
-            document.getElementById('driver-bus-name').innerText = selectedBus.name;
-            resetDriverUI();
-            
-            const stnBtn = document.getElementById('btn-add-station');
-            let pressTimer;
-
-            stnBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault(); 
-                pressTimer = setTimeout(() => openStationList(), 800);
-            });
-            stnBtn.addEventListener('touchend', () => clearTimeout(pressTimer));
-            stnBtn.addEventListener('mousedown', () => pressTimer = setTimeout(() => openStationList(), 800));
-            stnBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
-            stnBtn.onclick = () => {
-                if(!isDriving) return alert("Please Activate Sequence First");
-                if(pressTimer) clearTimeout(pressTimer); 
-                addStationPoint();
-            };
-        }
-
-        const btnToggle = document.getElementById('btn-toggle-gps');
-        const debugCoords = document.getElementById('debug-coords');
-        const statusDot = document.getElementById('status-dot');
-        const statusText = document.getElementById('status-text');
-        const stationBtn = document.getElementById('btn-add-station');
-        const bgVideo = document.getElementById('background-video');
-
-        function resetDriverUI() {
-            isDriving = false;
-            currentPos = null;
-            if(watchId) navigator.geolocation.clearWatch(watchId);
-            btnToggle.classList.remove('active');
-            
-            btnToggle.innerHTML = `
-                <span class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-gray-500">power_settings_new</span>
-                    <span class="btn-status-text font-bold text-lg tracking-widest text-gray-400">INITIATE SEQUENCE</span>
-                </span>
-                <span class="material-symbols-outlined text-gray-600">chevron_right</span>
-            `;
-            
-            debugCoords.innerHTML = "> SYSTEM STANDBY<br>> WAITING FOR SATELLITE UPLINK...";
-            debugCoords.style.color = "var(--neon-cyan)";
-            if(statusDot) { statusDot.classList.remove('bg-green-500'); statusDot.classList.add('bg-red-500'); }
-            if(statusText) statusText.innerText = "DISCONNECTED";
-            stationBtn.classList.add('opacity-50', 'pointer-events-none');
-            bgVideo.pause();
-            if(document.pictureInPictureElement) document.exitPictureInPicture();
-        }
-
-        btnToggle.addEventListener('click', async () => {
-            if (!isDriving) {
-                if (!navigator.geolocation) return alert("GPS System Failure");
-                isDriving = true;
-                btnToggle.classList.add('active');
-                stationBtn.classList.remove('opacity-50', 'pointer-events-none');
-                
-                try {
-                    bgVideo.src = BLANK_VIDEO;
-                    await bgVideo.play();
-                    if (document.pictureInPictureEnabled && !document.pictureInPictureElement) {
-                        bgVideo.requestPictureInPicture().catch(e => console.log("PiP blocked: ", e));
-                    }
-                } catch (e) { console.log("Video failed: ", e); }
-
-                btnToggle.innerHTML = `
-                    <span class="flex items-center gap-3">
-                        <span class="material-symbols-outlined animate-spin">sync</span>
-                        <span class="btn-status-text font-bold text-lg tracking-widest">ABORT SEQUENCE</span>
-                    </span>
-                    <span class="material-symbols-outlined">highlight_off</span>
-                `;
-
-                debugCoords.innerHTML = "> INITIALIZING UPLINK...<br>> ACQUIRING COORDINATES...";
-                debugCoords.style.color = "#00ff00";
-                if(statusDot) { statusDot.classList.remove('bg-red-500'); statusDot.classList.add('bg-green-500'); }
-                if(statusText) statusText.innerText = "ONLINE - TRANSMITTING";
-
-                const busRef = ref(database, 'buses/' + selectedBus.id + '/data');
-                onDisconnect(busRef).update({ active: false });
-
-                watchId = navigator.geolocation.watchPosition(pos => {
-                    const { latitude: lat, longitude: lng, speed, heading } = pos.coords;
-                    currentPos = { lat, lng };
-                    const spd = speed ? (speed * 3.6).toFixed(1) : 0;
-                    const time = new Date().toLocaleTimeString();
-                    const head = heading || 0;
-
-                    debugCoords.innerHTML = `> LAT: ${lat.toFixed(5)} | LNG: ${lng.toFixed(5)}<br>> SPD: ${spd} KM/H | HDG: ${Math.round(head)}°`;
-
-                    set(busRef, {
-                        lat, lng, speed: spd, heading: head, lastUpdated: time, active: true, 
-                        name: selectedBus.name, route: selectedBus.desc
-                    });
-                }, err => console.error(err), { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
-
-            } else {
-                set(ref(database, 'buses/' + selectedBus.id + '/data/active'), false);
-                resetDriverUI();
-                debugCoords.innerHTML = "> LINK TERMINATED<br>> SESSION ENDED";
+                alert("कोई भी वैध MCQ नहीं मिला। कृपया फॉर्मेट जांचें।");
             }
         });
 
-        function addStationPoint() {
-            if(!currentPos) return;
-            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const stationRef = ref(database, 'buses/' + selectedBus.id + '/stations');
-            push(stationRef, { lat: currentPos.lat, lng: currentPos.lng, time: time, name: "STATION " + time });
-            alert("STATION MARKER DROPPED");
-        }
+        function parseMCQs(text) {
+            const mcqs = [];
+            const mcqBlocks = text.split(/\n\s*\n/);
 
-        window.openStationList = function() {
-            const modal = document.getElementById('modal-station-list');
-            const container = document.getElementById('station-list-container');
-            container.innerHTML = '<div class="text-center text-xs text-gray-500 animate-pulse">LOADING DATA...</div>';
-            modal.classList.add('open');
+            mcqBlocks.forEach(block => {
+                if (block.trim() === '') return;
 
-            const stationRef = ref(database, 'buses/' + selectedBus.id + '/stations');
-            onValue(stationRef, (snapshot) => {
-                container.innerHTML = '';
-                const data = snapshot.val();
-                if(!data) {
-                    container.innerHTML = '<div class="text-center text-gray-500">NO STATIONS FOUND</div>';
-                    return;
-                }
-                Object.keys(data).forEach(key => {
-                    const stn = data[key];
-                    const div = document.createElement('div');
-                    div.className = "flex justify-between items-center bg-white/5 p-3 rounded border border-white/10";
-                    div.innerHTML = `
-                        <div>
-                            <div class="text-primary font-mono font-bold text-sm">${stn.name}</div>
-                            <div class="text-[10px] text-gray-400">LAT: ${stn.lat.toFixed(4)}</div>
-                        </div>
-                        <button class="bg-red-500/20 text-red-500 p-2 rounded hover:bg-red-500 hover:text-white transition" onclick="removeStation('${key}')">
-                            <span class="material-symbols-outlined text-sm">delete</span>
-                        </button>
-                    `;
-                    container.appendChild(div);
-                });
-            });
-        }
+                const lines = block.trim().split('\n');
+                let question = '';
+                const options = [];
+                let correctAnswer = '';
 
-        window.removeStation = function(key) {
-            if(confirm("Delete this station?")) remove(ref(database, 'buses/' + selectedBus.id + '/stations/' + key));
-        }
-
-        window.openProfile = function() {
-            document.getElementById('modal-profile').classList.add('open');
-            if(localStorage.getItem('studentName')) document.getElementById('prof-name').value = localStorage.getItem('studentName');
-            if(localStorage.getItem('studentPhone')) document.getElementById('prof-phone').value = localStorage.getItem('studentPhone');
-            if(localStorage.getItem('studentEmail')) document.getElementById('prof-email').value = localStorage.getItem('studentEmail');
-            if(localStorage.getItem('studentAddress')) document.getElementById('prof-address').value = localStorage.getItem('studentAddress');
-        }
-
-        window.saveProfile = function() {
-            const name = document.getElementById('prof-name').value;
-            const phone = document.getElementById('prof-phone').value;
-            const email = document.getElementById('prof-email').value;
-            const address = document.getElementById('prof-address').value;
-            
-            if(name && phone) {
-                localStorage.setItem('studentName', name);
-                localStorage.setItem('studentPhone', phone);
-                localStorage.setItem('studentEmail', email);
-                localStorage.setItem('studentAddress', address);
-                closeModal('modal-profile');
-                alert(`IDENTITY CONFIRMED: ${name}`);
-            } else {
-                alert("Name and Phone are required.");
-            }
-        }
-
-        function initStudentScreen() {
-            showScreen('student');
-            if (map) { map.remove(); map = null; }
-            map = L.map('map', { zoomControl: false }).setView([20.5937, 78.9629], 5);
-            setMapLayer('dark');
-
-            busMarker = null;
-            studentMarker = null;
-            stationMarkers = [];
-            routePolyline = null;
-            routingControl = null;
-            studentPos = null;
-            customStationPos = null;
-            walkingControl = null;
-            busPathHistory = []; // Reset history
-            if(busTrailPolyline) { map.removeLayer(busTrailPolyline); busTrailPolyline = null; }
-
-            // Load saved station if exists
-            const savedLat = localStorage.getItem('myStationLat');
-            const savedLng = localStorage.getItem('myStationLng');
-            if(savedLat && savedLng) {
-                customStationPos = { lat: parseFloat(savedLat), lng: parseFloat(savedLng) };
-                document.getElementById('btn-start-walk').style.display = 'block';
-                drawCustomStation();
-            }
-
-            if (navigator.geolocation) {
-                studentWatchId = navigator.geolocation.watchPosition(pos => {
-                    studentPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    updateStudentMarker();
-                    updatePolylineAndETA();
-                    if(isPassengerMode) {
-                        const uid = localStorage.getItem('studentPhone') || 'anon-' + Math.floor(Math.random()*1000);
-                        const passengerRef = ref(database, `buses/${selectedBus.id}/passengers/${uid}`);
-                        set(passengerRef, { lat: studentPos.lat, lng: studentPos.lng, timestamp: Date.now() });
-                        onDisconnect(passengerRef).remove();
-                    }
-                }, null, { enableHighAccuracy: true });
-            }
-
-            const busRef = ref(database, 'buses/' + selectedBus.id + '/data');
-            onValue(busRef, (snapshot) => {
-                const data = snapshot.val();
-                if(data) {
-                    updateMapDisplay(data, 'driver');
-                    updatePolylineAndETA();
-                } else {
-                    checkCrowdTracking();
-                }
-            });
-
-            loadStationsForMap();
-        }
-
-        function checkCrowdTracking() {
-            const passengersRef = ref(database, `buses/${selectedBus.id}/passengers`);
-            onValue(passengersRef, (snapshot) => {
-                const passengers = snapshot.val();
-                if(passengers) {
-                    let latSum = 0, lngSum = 0, count = 0;
-                    const now = Date.now();
-                    Object.values(passengers).forEach(p => {
-                        if (now - p.timestamp < 300000) { 
-                            latSum += p.lat; lngSum += p.lng; count++;
-                        }
-                    });
-                    if(count > 0) {
-                        const crowdData = {
-                            active: true, lat: latSum/count, lng: lngSum/count, speed: 0, heading: 0, 
-                            lastUpdated: "CROWD SOURCE", isGhost: true
-                        };
-                        updateMapDisplay(crowdData, 'crowd');
-                        updatePolylineAndETA();
-                    }
-                }
-            }, {onlyOnce: true});
-        }
-
-        window.togglePassengerMode = function() {
-            const btn = document.getElementById('menu-btn-passenger');
-            isPassengerMode = !isPassengerMode;
-            if(isPassengerMode) {
-                btn.style.color = "var(--neon-green)";
-                if(!localStorage.getItem('studentPhone')) {
-                    alert("Please set up your Profile first!");
-                    openProfile();
-                    isPassengerMode = false;
-                    btn.style.color = "white";
-                    return;
-                }
-                alert("PASSENGER MODE ACTIVE");
-            } else {
-                btn.style.color = "white";
-                const uid = localStorage.getItem('studentPhone');
-                if(uid) remove(ref(database, `buses/${selectedBus.id}/passengers/${uid}`));
-                alert("PASSENGER MODE OFF");
-            }
-            toggleSettings();
-        }
-
-        function setMapLayer(type) {
-            map.eachLayer((layer) => { if(layer._url) map.removeLayer(layer); });
-            if(type === 'dark') {
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19 }).addTo(map);
-            } else {
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19 }).addTo(map);
-            }
-        }
-
-        window.toggleMapTheme = function() {
-            const btn = document.getElementById('menu-btn-theme');
-            const isLight = btn.innerText.includes("LIGHT"); // Simple check
-            if(!isLight) {
-                setMapLayer('light');
-                btn.innerHTML = '<span class="material-symbols-outlined">light_mode</span><span class="text-sm font-bold tracking-widest">SWITCH TO DARK</span>';
-            } else {
-                setMapLayer('dark');
-                btn.innerHTML = '<span class="material-symbols-outlined">dark_mode</span><span class="text-sm font-bold tracking-widest">SWITCH TO LIGHT</span>';
-            }
-        }
-
-        function updateStudentMarker() {
-            if(!studentPos) return;
-            const studentHtml = `
-                <div class="map-pin-container">
-                    <div class="pin-pulse"></div>
-                    <span class="material-symbols-outlined pin-outer-student">location_on</span>
-                    <span class="material-symbols-outlined pin-inner-icon-student">person</span>
-                </div>
-            `;
-            const icon = L.divIcon({ 
-                className: 'custom-student', 
-                html: studentHtml, 
-                iconSize: [50, 50],
-                iconAnchor: [25, 45]
-            });
-
-            if(studentMarker) studentMarker.setLatLng([studentPos.lat, studentPos.lng]);
-            else studentMarker = L.marker([studentPos.lat, studentPos.lng], { icon: icon }).addTo(map);
-        }
-
-        function updateMapDisplay(data, source = 'driver') {
-            if (data) {
-                document.getElementById('disp-speed').innerText = Math.round(data.speed) + " KM/H";
-                const statusEl = document.getElementById('disp-time');
-                if(data.active) {
-                     statusEl.innerText = "ONLINE";
-                     statusEl.style.color = "#00ff66";
-                } else {
-                     statusEl.innerText = "LAST SEEN";
-                     statusEl.style.color = "#ff003c";
+                const answerLineIndex = lines.findIndex(line => line.includes('✅ Answer:'));
+                if (answerLineIndex !== -1) {
+                    const answerLine = lines.splice(answerLineIndex, 1)[0];
+                    correctAnswer = answerLine.replace('✅ Answer:', '').trim();
                 }
 
-                // --- GREEN TRAIL LOGIC (History) ---
-                busPathHistory.push([data.lat, data.lng]);
-                if (busTrailPolyline) map.removeLayer(busTrailPolyline);
+                question = lines.shift() || 'प्रश्न नहीं मिला';
                 
-                // If bus is "Missed" or inactive we might want to change color to Red, but for now Green trail for active path.
-                // Draw Green Polyline for history
-                busTrailPolyline = L.polyline(busPathHistory, {
-                    color: '#32CD32', // Green
-                    weight: 6,
-                    opacity: 0.8
-                }).addTo(map);
-
-                let busHtml;
-                if(source === 'crowd') {
-                    busHtml = `
-                        <div class="map-pin-container">
-                            <div class="pin-pulse"></div>
-                            <span class="material-symbols-outlined pin-outer-ghost">location_on</span>
-                            <span class="material-symbols-outlined pin-inner-icon-bus">question_mark</span>
-                        </div>
-                    `;
-                } else {
-                    const opacity = data.active ? 1 : 0.5;
-                    busHtml = `
-                        <div class="map-pin-container" style="opacity: ${opacity}">
-                            <div class="pin-pulse"></div>
-                            <span class="material-symbols-outlined pin-outer-bus">location_on</span>
-                            <span class="material-symbols-outlined pin-inner-icon-bus">directions_bus</span>
-                        </div>
-                    `;
-                }
-
-                const busIcon = L.divIcon({ 
-                    className: 'custom-bus-marker', 
-                    html: busHtml, 
-                    iconSize: [50, 50], 
-                    iconAnchor: [25, 45] 
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        options.push(line.trim());
+                    }
                 });
 
-                if (busMarker) {
-                    busMarker.setLatLng([data.lat, data.lng]);
-                    busMarker.setIcon(busIcon);
+                mcqs.push({ question, options, correctAnswer });
+            });
+            return mcqs;
+        }
+
+        function sendDataToSheet(data) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+            statusMessage.textContent = 'डेटा भेजा जा रहा है...';
+            statusMessage.className = '';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                // CORS एरर से बचने के लिए इसे टेक्स्ट के रूप में भेजें और Apps Script में पार्स करें
+                body: JSON.stringify(data) 
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === 'success'){
+                    statusMessage.textContent = 'सफलतापूर्वक गूगल शीट में सेव हो गया!';
+                    statusMessage.className = 'success';
+                    mcqTextInput.value = ''; // टेक्स्टबॉक्स खाली करें
                 } else {
-                    busMarker = L.marker([data.lat, data.lng], { icon: busIcon }).addTo(map);
-                    map.setView([data.lat, data.lng], 15);
+                    throw new Error(response.message);
                 }
-            }
-        }
-
-        // --- UPDATED ROUTING: TARGETS STATION IF SET (ORANGE LINE) ---
-        function updatePolylineAndETA() {
-            if (!studentPos || !busMarker) return;
-            const busLatLng = busMarker.getLatLng();
-
-            // Destination: If customStationPos exists, use that. Else use studentPos.
-            const destLat = customStationPos ? customStationPos.lat : studentPos.lat;
-            const destLng = customStationPos ? customStationPos.lng : studentPos.lng;
-
-            if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-
-            routingControl = L.Routing.control({
-                waypoints: [ L.latLng(destLat, destLng), L.latLng(busLatLng.lat, busLatLng.lng) ],
-                createMarker: function() { return null; },
-                addWaypoints: false,
-                draggableWaypoints: false,
-                fitSelectedRoutes: false, // Don't auto zoom, let user control
-                show: false 
-            }).on('routesfound', function(e) {
-                const routes = e.routes;
-                const summary = routes[0].summary;
-                const timeMin = Math.round(summary.totalTime / 60);
-                
-                // Update ETA Text based on destination
-                const suffix = customStationPos ? " TO STOP" : " TO YOU";
-                document.getElementById('disp-eta').innerText = (timeMin > 0 ? timeMin : "< 1") + " MIN" + suffix;
-
-                // MANUAL POLYLINE DRAWING (Fixes zoom disappearance)
-                if (routePolyline) map.removeLayer(routePolyline);
-                
-                // Orange Line for Pending Route (Bus -> Station)
-                routePolyline = L.polyline(e.routes[0].coordinates, {
-                    color: '#FF8C00', // Orange
-                    weight: 6,
-                    opacity: 0.9,
-                    dashArray: '10, 15', // Dotted Neon Effect
-                    lineCap: 'round',
-                    lineJoin: 'round'
-                }).addTo(map);
-
-            }).addTo(map);
-        }
-
-        let stationDataCache = {};
-        function loadStationsForMap() {
-            const stationRef = ref(database, 'buses/' + selectedBus.id + '/stations');
-            onValue(stationRef, (snapshot) => {
-                stationDataCache = snapshot.val() || {};
-                renderStationsOnMap(); 
+            })
+            .catch(error => {
+                statusMessage.textContent = 'त्रुटि: ' + error.message;
+                statusMessage.className = 'error';
+                console.error('Error!', error);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'शीट में सेव करें';
             });
-        }
-
-        function renderStationsOnMap() {
-            stationMarkers.forEach(m => map.removeLayer(m));
-            stationMarkers = [];
-            const icon = L.divIcon({ className: 'marker-pin-station', html: '📍', iconSize: [30, 30] });
-            Object.values(stationDataCache).forEach(stn => {
-                const marker = L.marker([stn.lat, stn.lng], { icon: icon }).bindPopup(`<b style="color:black">${stn.name}</b><br><span style="color:black">${stn.time}</span>`).addTo(map);
-                stationMarkers.push(marker);
-            });
-        }
-
-        window.openRouteList = function() {
-            const modal = document.getElementById('modal-route-list');
-            const container = document.getElementById('route-list-content');
-            modal.classList.add('open');
-            container.innerHTML = '';
-            if (Object.keys(stationDataCache).length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-500">NO STOPS RECORDED</div>';
-                return;
-            }
-            Object.values(stationDataCache).forEach(stn => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white/5 p-3 rounded border border-white/10";
-                div.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-primary">location_on</span>
-                        <div>
-                            <div class="text-white font-bold text-sm">${stn.name}</div>
-                            <div class="text-[10px] text-gray-400">ARRIVAL: ${stn.time}</div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // --- ONBOARDING LOGIC ---
-        const slides = [
-            { title: 'Live <span class="text-primary ml-2">Tracking</span>', desc: 'See exactly where your bus is in real-time.', btnText: 'Next', glowColor: 'bg-blue-500/30' },
-            { title: 'Maximum <span class="text-primary ml-2">Safety</span>', desc: 'Verified drivers and route monitoring.', btnText: 'Next', glowColor: 'bg-green-500/30' },
-            { title: 'Timely <span class="text-primary ml-2">Arrivals</span>', desc: 'Ensure you reach campus right on time.', btnText: 'Get Started', glowColor: 'bg-purple-500/30' }
-        ];
-        let currentStep = -1; 
-        const totalSteps = slides.length;
-
-        window.nextSlide = function() {
-            const textContent = document.getElementById('text-content');
-            textContent.classList.remove('opacity-100-trans');
-            textContent.classList.add('opacity-0-trans');
-            setTimeout(() => {
-                currentStep++;
-                if (currentStep < totalSteps) updateContent(currentStep);
-                else finishOnboarding();
-            }, 400); 
-        };
-
-        window.finishOnboarding = function() {
-            const actionBtn = document.getElementById('action-btn');
-            if(actionBtn) actionBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span>`;
-            setTimeout(() => showScreen('roles'), 800);
-        };
-
-        function updateContent(index) {
-            const slide = slides[index];
-            if (index === 0) {
-                document.getElementById('dots-container').classList.remove('opacity-0');
-                document.getElementById('skip-btn').classList.remove('hidden');
-            }
-            document.getElementById('main-title').innerHTML = slide.title;
-            document.getElementById('main-desc').innerHTML = slide.desc;
-            document.getElementById('btn-text').innerText = slide.btnText;
-            document.getElementById('glow-effect').className = `absolute inset-0 blur-3xl rounded-full transform scale-75 transition-all duration-700 ${slide.glowColor}`;
-            document.getElementById('btn-icon').innerText = (index === totalSteps - 1) ? "check_circle" : "arrow_forward";
-            document.getElementById('text-content').classList.remove('opacity-0-trans');
-            document.getElementById('text-content').classList.add('opacity-100-trans');
         }
     </script>
+
 </body>
 </html>
